@@ -1,0 +1,38 @@
+version: '3'
+services:
+  database:
+    container_name: mysql_db
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: asac
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_PASSWORD: admin1234
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    networks:
+      - docker_net
+    restart: always
+
+  application:
+    container_name: spring_docker_compose
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    depends_on:
+      - database
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/asac
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin1234
+    networks:
+      - default
+      - docker_net
+    restart: always
+
+networks:
+  docker_net: 
+    driver: bridge
